@@ -59,7 +59,7 @@ class SpreadsheetManager:
 
     def send_answer(self, question, answer, name) -> None:
         # Get the current value in A1 and increment it by 1
-        current_row = int(self.sh.worksheet(name).get('A1').first()) + 1
+        current_row = int(self.sh.worksheet(name).get('A2').first()) + 1
 
         # Put the question in B2, the answer in C2 (or in the corresponding columns)
         cell_question = f"B{current_row}"
@@ -68,4 +68,4 @@ class SpreadsheetManager:
         self.sh.worksheet(name).update(cell_answer, answer)
 
         # Update the value in A1 with the new row position
-        self.sh.worksheet(name).update("A1", current_row)
+        self.sh.worksheet(name).update("A2", current_row)
