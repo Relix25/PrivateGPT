@@ -49,7 +49,7 @@ class XLSXLoader(BaseLoader):
         row_dict = dict(zip(headers, row_values))
 
         # Update this line to fix the error
-        content = "\n".join(f"{k.strip()}: {v.strip() if isinstance(v, str) else v}" for k, v in row_dict.items() if v is not None)
+        content = "\n".join(f"{k.strip()}: {str(v).strip() if isinstance(v, str) else v}" for k, v in row_dict.items() if v is not None)
 
         if self.source_column is not None:
             source = row_dict[self.source_column]
