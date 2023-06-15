@@ -6,6 +6,7 @@ from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain.vectorstores import Chroma
 from langchain.llms import GPT4All, LlamaCpp
 import os
+import time
 import argparse
 from torch import cuda as torch_cuda
 from SpreadsheetManager import SpreadsheetManager
@@ -43,6 +44,24 @@ def calculate_layer_count() -> int | None:
         return (get_gpu_memory()//LAYER_SIZE_MB-LAYERS_TO_REDUCE)
 
 def main():
+    # Instantiate the SpreadsheetManager class
+    manager = SpreadsheetManager(
+      "1GlWdwEq2yo-_zxwCa02gVPjW5eykxJLv1f-zAWphPQ8",
+      question="B",
+      answer="D",
+      source="E",
+      time="G",
+      start_from=3,
+      end_at=23,
+      tab=3,
+    )
+
+    # Authenticate with Google Sheets
+    manager.authenticate()
+
+    # get_questions
+    print("Questions:", list(manager.get_questions()))
+
     # Parse the command line arguments
     args = parse_arguments()
     embeddings_kwargs = {'device': 'cuda'} if is_gpu_enabled else {}
@@ -65,25 +84,34 @@ def main():
             exit;
     qa = RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", retriever=retriever, return_source_documents= not args.hide_source)
     # Interactive questions and answers
-    while True:
-        query = input("\nEnter a query: ")
-        if query == "exit":
-            break
 
+    print("Fetching the questions...")
+    for i, question in enumerate(manager.get_questions()):
+        manager.send_answer(i, "Thinking...", "", "")
+        start = time.time()
         # Get the answer from the chain
-        res = qa(query)
+        res = qa(question)
         answer, docs = res['result'], [] if args.hide_source else res['source_documents']
 
         # Print the result
         print("\n\n> Question:")
-        print(query)
+        print(question)
         print("\n> Answer:")
         print(answer)
+        elapsed_time = int(time.time() - start)
+        print("\n> Time:", elapsed_time, "s")
 
-        # Print the relevant sources used for the answer
+        source = ""
+        # Get the relevant sources used for the answer
         for document in docs:
-            print("\n> " + document.metadata["source"] + ":")
-            print(document.page_content)
+            source += "\n> " + document.metadata["source"] + ":\n"
+            source += document.page_content + "\n"
+
+        print(source)
+        print("-" * 80)
+
+        # send_answer(question_index, answer, source, time)
+        manager.send_answer(i, answer, source, elapsed_time)
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description='privateGPT: Ask questions to your documents without an internet connection, '
