@@ -43,17 +43,6 @@ def calculate_layer_count() -> int | None:
         return (get_gpu_memory()//LAYER_SIZE_MB-LAYERS_TO_REDUCE)
 
 def main():
-    # Instantiate the SpreadsheetManager class
-    manager = SpreadsheetManager("1R10Z_F1Nh8HSzcnms1MtIIAaEgazXpBm22ZAjAruyGs")
-
-    # Authenticate with Google Sheets
-    manager.authenticate()
-
-    # Specify the name of the worksheet
-    name = 'WizardLM - Test'
-
-    # Create the worksheet
-    manager.create_worksheet(name)
     # Parse the command line arguments
     args = parse_arguments()
     embeddings_kwargs = {'device': 'cuda'} if is_gpu_enabled else {}
@@ -90,9 +79,6 @@ def main():
         print(query)
         print("\n> Answer:")
         print(answer)
-
-        # send_answer(<Question>, <Answer>, <Worksheet name>)
-        manager.send_answer(query, answer, name)
 
         # Print the relevant sources used for the answer
         for document in docs:
