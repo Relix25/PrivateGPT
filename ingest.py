@@ -5,6 +5,8 @@ from typing import List
 from dotenv import load_dotenv
 from multiprocessing import Pool
 from tqdm import tqdm
+from assets.xlsx_loader import XLSXLoader
+
 
 from langchain.document_loaders import (
     CSVLoader,
@@ -78,6 +80,7 @@ LOADER_MAPPING = {
     ".ppt": (UnstructuredPowerPointLoader, {}),
     ".pptx": (UnstructuredPowerPointLoader, {}),
     ".txt": (TextLoader, {"encoding": "utf8"}),
+    ".xlsx" : (XLSXLoader, {})
     # Add more mappings for other file extensions and loaders as needed
 }
 
