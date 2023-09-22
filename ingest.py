@@ -143,12 +143,10 @@ def does_vectorstore_exist(persist_directory: str) -> bool:
     return False
 
 def main():
-    # Create embeddings
     embeddings_kwargs = {'device': 'cuda'} if is_gpu_enabled else {}
     embeddings = HuggingFaceEmbeddings(model_name=embeddings_model_name, model_kwargs=embeddings_kwargs)
 
     if does_vectorstore_exist(persist_directory):
-        # Update and store locally vectorstore
         print(f"Appending to existing vectorstore at {persist_directory}")
         db = Chroma(persist_directory=persist_directory, embedding_function=embeddings, client_settings=CHROMA_SETTINGS)
         collection = db.get()
@@ -156,7 +154,6 @@ def main():
         print(f"Creating embeddings. May take some minutes...")
         db.add_documents(texts)
     else:
-        # Create and store locally vectorstore
         print("Creating new vectorstore")
         texts = process_documents()
         print(f"Creating embeddings. May take some minutes...")
